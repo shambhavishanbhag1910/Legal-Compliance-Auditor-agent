@@ -1,0 +1,21 @@
+[
+  {
+    "case_id": "privacy-001",
+    "document_id": "gold-privacy-001",
+    "document_path": "sample_docs/privacy_policy_acme.txt",
+    "framework": "privacy",
+    "non_compliant_rule_ids": [
+      "PRIV-004",
+      "PRIV-005"
+    ]
+  },
+  {
+    "case_id": "tos-001",
+    "document_id": "gold-tos-001",
+    "document_path": "sample_docs/tos_example.txt",
+    "framework": "tos",
+    "non_compliant_rule_ids": [
+      "TOS-004"
+    ]
+  }
+]

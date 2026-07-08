@@ -1,0 +1,278 @@
+[
+  {
+    "case_id": "privacy-001",
+    "document_id": "gold-privacy-001",
+    "framework": "privacy",
+    "document_path": "sample_docs/benchmark/privacy/privacy_001_complete_cloud_platform.txt",
+    "non_compliant_rule_ids": []
+  },
+  {
+    "case_id": "privacy-002",
+    "document_id": "gold-privacy-002",
+    "framework": "privacy",
+    "document_path": "sample_docs/benchmark/privacy/privacy_002_missing_retention_rights.txt",
+    "non_compliant_rule_ids": [
+      "PRIV-004",
+      "PRIV-005"
+    ]
+  },
+  {
+    "case_id": "privacy-003",
+    "document_id": "gold-privacy-003",
+    "framework": "privacy",
+    "document_path": "sample_docs/benchmark/privacy/privacy_003_missing_sharing_contact.txt",
+    "non_compliant_rule_ids": [
+      "PRIV-003",
+      "PRIV-007"
+    ]
+  },
+  {
+    "case_id": "privacy-004",
+    "document_id": "gold-privacy-004",
+    "framework": "privacy",
+    "document_path": "sample_docs/benchmark/privacy/privacy_004_missing_purpose_security.txt",
+    "non_compliant_rule_ids": [
+      "PRIV-002",
+      "PRIV-006"
+    ]
+  },
+  {
+    "case_id": "privacy-005",
+    "document_id": "gold-privacy-005",
+    "framework": "privacy",
+    "document_path": "sample_docs/benchmark/privacy/privacy_005_missing_retention.txt",
+    "non_compliant_rule_ids": [
+      "PRIV-004"
+    ]
+  },
+  {
+    "case_id": "privacy-006",
+    "document_id": "gold-privacy-006",
+    "framework": "privacy",
+    "document_path": "sample_docs/benchmark/privacy/privacy_006_missing_user_rights.txt",
+    "non_compliant_rule_ids": [
+      "PRIV-005"
+    ]
+  },
+  {
+    "case_id": "privacy-007",
+    "document_id": "gold-privacy-007",
+    "framework": "privacy",
+    "document_path": "sample_docs/benchmark/privacy/privacy_007_missing_collection_purpose.txt",
+    "non_compliant_rule_ids": [
+      "PRIV-001",
+      "PRIV-002"
+    ]
+  },
+  {
+    "case_id": "privacy-008",
+    "document_id": "gold-privacy-008",
+    "framework": "privacy",
+    "document_path": "sample_docs/benchmark/privacy/privacy_008_missing_security_retention.txt",
+    "non_compliant_rule_ids": [
+      "PRIV-006",
+      "PRIV-004"
+    ]
+  },
+  {
+    "case_id": "privacy-009",
+    "document_id": "gold-privacy-009",
+    "framework": "privacy",
+    "document_path": "sample_docs/benchmark/privacy/privacy_009_missing_sharing_rights_contact.txt",
+    "non_compliant_rule_ids": [
+      "PRIV-003",
+      "PRIV-005",
+      "PRIV-007"
+    ]
+  },
+  {
+    "case_id": "privacy-010",
+    "document_id": "gold-privacy-010",
+    "framework": "privacy",
+    "document_path": "sample_docs/benchmark/privacy/privacy_010_complete_manufacturing_saas.txt",
+    "non_compliant_rule_ids": []
+  },
+  {
+    "case_id": "tos-001",
+    "document_id": "gold-tos-001",
+    "framework": "tos",
+    "document_path": "sample_docs/benchmark/tos/tos_001_complete_enterprise_saas.txt",
+    "non_compliant_rule_ids": []
+  },
+  {
+    "case_id": "tos-002",
+    "document_id": "gold-tos-002",
+    "framework": "tos",
+    "document_path": "sample_docs/benchmark/tos/tos_002_missing_termination.txt",
+    "non_compliant_rule_ids": [
+      "TOS-004"
+    ]
+  },
+  {
+    "case_id": "tos-003",
+    "document_id": "gold-tos-003",
+    "framework": "tos",
+    "document_path": "sample_docs/benchmark/tos/tos_003_missing_payment_disputes.txt",
+    "non_compliant_rule_ids": [
+      "TOS-003",
+      "TOS-006"
+    ]
+  },
+  {
+    "case_id": "tos-004",
+    "document_id": "gold-tos-004",
+    "framework": "tos",
+    "document_path": "sample_docs/benchmark/tos/tos_004_missing_acceptable_use.txt",
+    "non_compliant_rule_ids": [
+      "TOS-002"
+    ]
+  },
+  {
+    "case_id": "tos-005",
+    "document_id": "gold-tos-005",
+    "framework": "tos",
+    "document_path": "sample_docs/benchmark/tos/tos_005_missing_liability.txt",
+    "non_compliant_rule_ids": [
+      "TOS-005"
+    ]
+  },
+  {
+    "case_id": "tos-006",
+    "document_id": "gold-tos-006",
+    "framework": "tos",
+    "document_path": "sample_docs/benchmark/tos/tos_006_missing_account_termination.txt",
+    "non_compliant_rule_ids": [
+      "TOS-001",
+      "TOS-004"
+    ]
+  },
+  {
+    "case_id": "tos-007",
+    "document_id": "gold-tos-007",
+    "framework": "tos",
+    "document_path": "sample_docs/benchmark/tos/tos_007_missing_payment.txt",
+    "non_compliant_rule_ids": [
+      "TOS-003"
+    ]
+  },
+  {
+    "case_id": "tos-008",
+    "document_id": "gold-tos-008",
+    "framework": "tos",
+    "document_path": "sample_docs/benchmark/tos/tos_008_missing_disputes.txt",
+    "non_compliant_rule_ids": [
+      "TOS-006"
+    ]
+  },
+  {
+    "case_id": "tos-009",
+    "document_id": "gold-tos-009",
+    "framework": "tos",
+    "document_path": "sample_docs/benchmark/tos/tos_009_missing_acceptable_liability.txt",
+    "non_compliant_rule_ids": [
+      "TOS-002",
+      "TOS-005"
+    ]
+  },
+  {
+    "case_id": "tos-010",
+    "document_id": "gold-tos-010",
+    "framework": "tos",
+    "document_path": "sample_docs/benchmark/tos/tos_010_missing_payment_termination_disputes.txt",
+    "non_compliant_rule_ids": [
+      "TOS-003",
+      "TOS-004",
+      "TOS-006"
+    ]
+  },
+  {
+    "case_id": "financial-001",
+    "document_id": "gold-financial-001",
+    "framework": "financial",
+    "document_path": "sample_docs/benchmark/financial/financial_001_complete_industrial_group.txt",
+    "non_compliant_rule_ids": []
+  },
+  {
+    "case_id": "financial-002",
+    "document_id": "gold-financial-002",
+    "framework": "financial",
+    "document_path": "sample_docs/benchmark/financial/financial_002_missing_material_risks.txt",
+    "non_compliant_rule_ids": [
+      "FIN-003"
+    ]
+  },
+  {
+    "case_id": "financial-003",
+    "document_id": "gold-financial-003",
+    "framework": "financial",
+    "document_path": "sample_docs/benchmark/financial/financial_003_missing_basis_forward.txt",
+    "non_compliant_rule_ids": [
+      "FIN-004",
+      "FIN-005"
+    ]
+  },
+  {
+    "case_id": "financial-004",
+    "document_id": "gold-financial-004",
+    "framework": "financial",
+    "document_path": "sample_docs/benchmark/financial/financial_004_missing_revenue.txt",
+    "non_compliant_rule_ids": [
+      "FIN-002"
+    ]
+  },
+  {
+    "case_id": "financial-005",
+    "document_id": "gold-financial-005",
+    "framework": "financial",
+    "document_path": "sample_docs/benchmark/financial/financial_005_missing_period.txt",
+    "non_compliant_rule_ids": [
+      "FIN-001"
+    ]
+  },
+  {
+    "case_id": "financial-006",
+    "document_id": "gold-financial-006",
+    "framework": "financial",
+    "document_path": "sample_docs/benchmark/financial/financial_006_missing_risks_forward.txt",
+    "non_compliant_rule_ids": [
+      "FIN-003",
+      "FIN-005"
+    ]
+  },
+  {
+    "case_id": "financial-007",
+    "document_id": "gold-financial-007",
+    "framework": "financial",
+    "document_path": "sample_docs/benchmark/financial/financial_007_missing_accounting_basis.txt",
+    "non_compliant_rule_ids": [
+      "FIN-004"
+    ]
+  },
+  {
+    "case_id": "financial-008",
+    "document_id": "gold-financial-008",
+    "framework": "financial",
+    "document_path": "sample_docs/benchmark/financial/financial_008_missing_revenue_risks.txt",
+    "non_compliant_rule_ids": [
+      "FIN-002",
+      "FIN-003"
+    ]
+  },
+  {
+    "case_id": "financial-009",
+    "document_id": "gold-financial-009",
+    "framework": "financial",
+    "document_path": "sample_docs/benchmark/financial/financial_009_missing_period_forward.txt",
+    "non_compliant_rule_ids": [
+      "FIN-001",
+      "FIN-005"
+    ]
+  },
+  {
+    "case_id": "financial-010",
+    "document_id": "gold-financial-010",
+    "framework": "financial",
+    "document_path": "sample_docs/benchmark/financial/financial_010_complete_manufacturing_platform.txt",
+    "non_compliant_rule_ids": []
+  }
+]

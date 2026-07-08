@@ -1,0 +1,20 @@
+ACME ANALYTICS PRIVACY POLICY
+
+Effective date: January 1, 2026
+
+1. Information We Collect
+We collect account information such as name, business email address, organization name, and login identifiers. When customers use our analytics service, we also collect device information, IP address, browser type, product usage events, and support communications.
+
+2. How We Use Information
+We use information to provide and secure the service, authenticate users, operate customer support, troubleshoot incidents, improve product features, and communicate important service updates.
+
+3. Sharing of Information
+We share information with cloud hosting, customer support, security monitoring, and payment service providers that process information on our behalf. We may also disclose information when required by law or in connection with a corporate transaction.
+
+4. Security
+We use administrative, technical, and organizational safeguards designed to protect personal information. Access to production systems is restricted by role and sensitive traffic is encrypted in transit.
+
+5. Contact
+Questions about this privacy policy may be sent to privacy@acme-example.com.
+
+This policy does not state a defined retention period or objective retention criteria. It also does not describe procedures for requesting access, correction, deletion, restriction, portability, or objection.

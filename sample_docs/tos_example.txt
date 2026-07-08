@@ -1,0 +1,18 @@
+EXAMPLE CLOUD SERVICE TERMS
+
+1. Accounts
+Users must provide accurate registration information, protect account credentials, and promptly notify us of suspected unauthorized access.
+
+2. Acceptable Use
+Users may not interfere with service availability, probe security controls without authorization, upload malicious code, or use the service for unlawful activity.
+
+3. Fees and Refunds
+Subscription fees are billed in advance. Except where mandatory law requires otherwise, fees already paid are non-refundable.
+
+4. Warranty and Liability
+The service is provided on an as-available basis to the maximum extent permitted by law. Aggregate contractual liability is limited to fees paid during the prior twelve months.
+
+5. Governing Law
+These terms are governed by the laws identified in the customer's order form. Disputes will be handled in the courts identified in that order form.
+
+These terms do not describe when the provider may suspend or terminate an account, nor the process following termination.

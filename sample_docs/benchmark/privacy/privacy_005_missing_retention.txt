@@ -1,0 +1,31 @@
+CEDARPAY MERCHANT SERVICES PRIVACY NOTICE
+
+Effective Date: January 5, 2026
+
+Overview
+CedarPay Merchant Services provides business software and related support services. This notice describes how personal information is handled when customers, authorized users, website visitors, and business contacts interact with our services.
+
+
+Information We Collect
+We collect account registration details including name, business email address, company, role, and authentication identifiers. When customers use the service, we receive device identifiers, IP address, browser metadata, feature interaction events, support correspondence, and administrator configuration data. Customers may also upload business records for processing within their workspace.
+
+How We Use Information
+We use information to provide and secure the service, authenticate users, process customer instructions, troubleshoot incidents, respond to support requests, improve reliability and product features, communicate service changes, prevent abuse, and meet legal obligations. Product analytics are used to understand adoption patterns and improve usability.
+
+Sharing and Service Providers
+We disclose information to contracted infrastructure hosting, customer support, email delivery, payment processing, observability, and security monitoring providers that act on our instructions. Information may also be disclosed when required by law, to protect rights and safety, or during a merger, financing, acquisition, or sale of assets. We do not sell personal information.
+
+Your Privacy Choices and Rights
+Subject to applicable law, individuals may request access, correction, deletion, restriction, portability, or objection to certain processing. Requests may be submitted through the privacy request form or by email. We verify identity before fulfilling requests and respond within the period required by applicable law. Authorized agents may submit requests where permitted.
+
+Security
+We maintain administrative, technical, and organizational safeguards designed to protect personal information. Controls include role-based access, multifactor authentication for privileged users, encryption in transit, encryption at rest for production databases, vulnerability management, centralized logging, incident response procedures, and periodic access reviews.
+
+Contact
+Privacy questions and requests may be sent to privacy@cedarpay.example. Written correspondence may be directed to the Privacy Office, 90 Commerce Plaza, Dallas, TX. Complaints may also be raised through the customer support portal and will be routed to the privacy team.
+
+International and Contractual Context
+Where service delivery involves cross-border processing, contractual and technical measures are used according to applicable requirements and customer agreements. Enterprise customers remain responsible for configuring their workspaces and providing notices required for data they control.
+
+Changes to This Notice
+We may update this notice to reflect service, legal, or operational changes. Material revisions will be communicated through the service or other appropriate channels.

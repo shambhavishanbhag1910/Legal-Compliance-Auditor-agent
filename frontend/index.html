@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Compliance Auditor</title>
+  <meta
+    name="description"
+    content="Evidence-grounded AI compliance audit dashboard"
+  />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">A</div>
+        <div>
+          <div class="brand-name">Audit Intelligence</div>
+          <div class="brand-subtitle">Evidence-first compliance</div>
+        </div>
+      </div>
+
+      <div class="side-section">
+        <div class="eyebrow">New audit</div>
+
+        <label class="upload-zone" id="uploadZone" for="fileInput">
+          <input id="fileInput" type="file" accept=".txt,.md,.pdf" hidden />
+          <div class="upload-icon">↥</div>
+          <div class="upload-title">Drop a document here</div>
+          <div class="upload-copy">TXT, MD or text-based PDF</div>
+          <div class="upload-file" id="fileName">No file selected</div>
+        </label>
+
+        <label class="field">
+          <span>Framework</span>
+          <select id="framework">
+            <option value="privacy">Privacy Policy</option>
+            <option value="tos">Terms of Service</option>
+            <option value="financial">Financial Disclosure</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Self-consistency runs</span>
+          <select id="runs">
+            <option value="3" selected>3 candidates</option>
+            <option value="4">4 candidates</option>
+            <option value="5">5 candidates</option>
+          </select>
+        </label>
+
+        <button class="primary-btn" id="runAuditBtn" disabled>
+          <span>Run audit</span>
+          <span>→</span>
+        </button>
+      </div>
+
+      <div class="side-footer">
+        <div class="system-dot"></div>
+        <div>
+          <div class="system-title" id="systemStatus">Checking API</div>
+          <div class="system-copy" id="systemDetail">Connecting to backend...</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">AI Legal and Compliance Auditor</div>
+          <h1>Audit decisions you can trace back to evidence.</h1>
+          <p>
+            Tool-driven evidence collection, strict structured outputs,
+            self-consistency consensus, and independent LLM evaluation.
+          </p>
+        </div>
+        <div class="topbar-badge">GROQ · GPT OSS</div>
+      </header>
+
+      <section class="welcome-panel" id="welcomePanel">
+        <div class="welcome-copy">
+          <span class="pill">HOW IT WORKS</span>
+          <h2>From raw policy to validated findings</h2>
+          <p>
+            Upload a document. The evidence agent searches the source,
+            the system generates multiple independent audits, resolves them
+            through rule-level consensus, then judges the final report for
+            faithfulness and hallucination.
+          </p>
+        </div>
+        <div class="flow">
+          <div class="flow-step">
+            <span>01</span><strong>Ingest</strong><small>Parse and chunk</small>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <span>02</span><strong>Investigate</strong><small>Agent tool calls</small>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <span>03</span><strong>Consensus</strong><small>Multi-run voting</small>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <span>04</span><strong>Judge</strong><small>Grounding checks</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="progress-panel hidden" id="progressPanel">
+        <div class="progress-head">
+          <div>
+            <div class="eyebrow">AUDIT IN PROGRESS</div>
+            <h2 id="progressTitle">Preparing document</h2>
+          </div>
+          <div class="spinner"></div>
+        </div>
+        <div class="stage-grid">
+          <div class="stage active" data-stage="upload">
+            <span>1</span><div><strong>Ingest</strong><small>Upload and parse</small></div>
+          </div>
+          <div class="stage" data-stage="evidence">
+            <span>2</span><div><strong>Evidence</strong><small>Agent tool use</small></div>
+          </div>
+          <div class="stage" data-stage="consensus">
+            <span>3</span><div><strong>Consensus</strong><small>Candidate voting</small></div>
+          </div>
+          <div class="stage" data-stage="judge">
+            <span>4</span><div><strong>Judge</strong><small>Quality evaluation</small></div>
+          </div>
+        </div>
+        <div class="progress-track"><div id="progressBar"></div></div>
+        <p id="progressMessage">Uploading source document...</p>
+      </section>
+
+      <section class="results hidden" id="results">
+        <div class="result-header">
+          <div>
+            <div class="eyebrow">AUDIT RESULT</div>
+            <h2 id="resultTitle">Compliance assessment</h2>
+            <p id="executiveSummary"></p>
+          </div>
+          <div class="risk-badge" id="riskBadge">
+            <span>Overall risk</span>
+            <strong id="riskValue">—</strong>
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <article class="metric-card">
+            <span>Consensus</span>
+            <strong id="consensusMetric">—</strong>
+            <small>Rule-level agreement</small>
+          </article>
+          <article class="metric-card">
+            <span>Faithfulness</span>
+            <strong id="faithfulnessMetric">—</strong>
+            <small>Grounded in source</small>
+          </article>
+          <article class="metric-card">
+            <span>Completeness</span>
+            <strong id="completenessMetric">—</strong>
+            <small>Framework coverage</small>
+          </article>
+          <article class="metric-card">
+            <span>Hallucination</span>
+            <strong id="hallucinationMetric">—</strong>
+            <small>Unsupported claim rate</small>
+          </article>
+        </div>
+
+        <div class="content-grid">
+          <section class="findings-panel">
+            <div class="section-head">
+              <div>
+                <div class="eyebrow">RULE ASSESSMENT</div>
+                <h3>Compliance findings</h3>
+              </div>
+              <div class="filters" id="findingFilters">
+                <button class="filter active" data-filter="all">All</button>
+                <button class="filter" data-filter="non_compliant">Gaps</button>
+                <button class="filter" data-filter="unclear">Unclear</button>
+                <button class="filter" data-filter="compliant">Compliant</button>
+              </div>
+            </div>
+            <div id="findingsList" class="findings-list"></div>
+          </section>
+
+          <aside class="right-column">
+            <section class="judge-panel">
+              <div class="eyebrow">INDEPENDENT JUDGE</div>
+              <h3>Evaluation comments</h3>
+              <p id="judgeComments"></p>
+              <div class="judge-flags">
+                <div>
+                  <span>Unsupported findings</span>
+                  <strong id="unsupportedCount">0</strong>
+                </div>
+                <div>
+                  <span>Fabricated claims</span>
+                  <strong id="fabricatedCount">0</strong>
+                </div>
+              </div>
+            </section>
+
+            <section class="trace-panel">
+              <div class="section-head compact">
+                <div>
+                  <div class="eyebrow">AGENT TRACE</div>
+                  <h3>Tool activity</h3>
+                </div>
+                <span class="trace-count" id="traceCount">0 calls</span>
+              </div>
+              <div id="traceList" class="trace-list"></div>
+            </section>
+          </aside>
+        </div>
+
+        <section class="limitations-panel">
+          <div>
+            <div class="eyebrow">LIMITATIONS</div>
+            <h3>Audit boundaries</h3>
+          </div>
+          <ul id="limitationsList"></ul>
+        </section>
+      </section>
+
+      <section class="error-panel hidden" id="errorPanel">
+        <div class="error-icon">!</div>
+        <div>
+          <div class="eyebrow">AUDIT FAILED</div>
+          <h3 id="errorTitle">The audit could not complete</h3>
+          <p id="errorMessage"></p>
+          <button class="secondary-btn" id="retryBtn">Try again</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/static/app.js" defer></script>
+</body>
+</html>

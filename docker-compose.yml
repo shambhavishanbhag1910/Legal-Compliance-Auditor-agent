@@ -1,0 +1,16 @@
+services:
+  auditor-api:
+    build:
+      context: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      STORAGE_BACKEND: local
+      LOCAL_DATA_DIR: /app/data
+    volumes:
+      - auditor_data:/app/data
+
+volumes:
+  auditor_data:

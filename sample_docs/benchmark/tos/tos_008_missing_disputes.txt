@@ -1,0 +1,30 @@
+VECTOROPS INDUSTRIAL ANALYTICS TERMS OF SERVICE
+
+Effective Date: February 8, 2026
+
+These Terms govern access to and use of VectorOps Industrial Analytics's hosted software, APIs, documentation, and related support services. An order form may contain commercial terms that supplement these Terms. If an order form conflicts with these Terms, the order form controls for that transaction.
+
+
+Accounts and Responsibilities
+Users must provide accurate registration information, protect credentials, maintain appropriate permissions for authorized users, and promptly notify the company of suspected unauthorized access. Account holders are responsible for activity performed through their credentials and for ensuring that users comply with organizational policies.
+
+Acceptable Use
+Users may not interfere with service integrity, attempt unauthorized access, probe or scan systems without permission, upload malicious code, use the service to violate law or third-party rights, bypass usage controls, scrape the service at unreasonable rates, or use the platform to distribute abusive, deceptive, or unlawful content.
+
+Fees, Billing, and Refunds
+Subscription fees are billed in advance according to the order form. Taxes are additional unless stated otherwise. Customers must dispute invoice errors within 30 days. Except where required by law or expressly stated in an order form, fees are non-refundable. Approved service credits are applied to future invoices and are not cash refunds.
+
+Suspension and Termination
+We may suspend access when necessary to address a security threat, material breach, unlawful use, or overdue undisputed payment after notice. Either party may terminate for material breach that remains uncured for 30 days after written notice. Upon termination, access ends and customer content may be exported during the contractual retrieval period.
+
+Warranties and Limitation of Liability
+The service is provided subject to the express warranties in the applicable order form. To the maximum extent permitted by law, implied warranties are disclaimed. Neither party is liable for indirect, incidental, special, or consequential damages. Aggregate liability is limited to fees paid or payable during the 12 months preceding the event giving rise to the claim, subject to stated exclusions.
+
+Confidentiality and Customer Content
+Each party will protect the other party's confidential information using reasonable care. Customers retain ownership of content they submit to the service and grant the company the rights necessary to host, process, secure, and transmit that content for service delivery.
+
+Changes and Notices
+Material changes to these Terms will be communicated through reasonable channels. Formal notices must be sent to the addresses identified in the applicable order form or account administration page.
+
+General
+Neither party may assign the agreement without consent except in connection with a merger, reorganization, or sale of substantially all relevant assets. If one provision is unenforceable, the remainder continues in effect. Failure to enforce a right is not a waiver.
