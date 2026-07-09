@@ -45,10 +45,11 @@ class LLMClient:
 
     BUSINESS_VALIDATION_ATTEMPTS = 3
 
-    AUDIT_MAX_COMPLETION_TOKENS = 3600
+    AUDIT_MAX_COMPLETION_TOKENS = 2200
 
     JUDGE_MAX_COMPLETION_TOKENS = 1000
 
+    MAX_RETRY_AFTER_SECONDS = 90.0
 
     # =========================================================
     # INITIALIZATION
@@ -59,7 +60,7 @@ class LLMClient:
         settings: Settings,
     ) -> None:
 
-        if not settings.groq_api_key:
+        if not settings.groq_api_key.get_secret_value():
             raise RuntimeError(
                 "GROQ_API_KEY is required for auditing."
             )
@@ -77,7 +78,7 @@ class LLMClient:
         self.settings = settings
 
         self.client = OpenAI(
-            api_key=settings.groq_api_key,
+            api_key=settings.groq_api_key.get_secret_value(),
             base_url=settings.groq_base_url,
         )
 
@@ -180,8 +181,20 @@ class LLMClient:
                     )
                 )
 
+                if (
+                    retry_after is not None
+                    and retry_after > self.MAX_RETRY_AFTER_SECONDS
+                ):
+                    raise RuntimeError(
+                        "Groq returned a long rate-limit wait of "
+                        f"{retry_after:.2f} seconds. "
+                        "Stopping instead of blocking the evaluation process."
+                    ) from exc
+
+
                 if retry_after is not None:
                     delay = retry_after
+
                 else:
                     delay = min(
                         2 ** (attempt - 1),

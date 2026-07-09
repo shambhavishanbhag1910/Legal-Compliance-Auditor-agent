@@ -16,7 +16,15 @@ variable "image_uri" {
   default     = "public.ecr.aws/docker/library/python:3.12-slim"
 }
 
-variable "openai_model" {
-  type    = string
-  default = "gpt-4.1-mini"
+variable "groq_model" {
+  type        = string
+  description = "Groq model name"
+  default     = "openai/gpt-oss-20b"
+}
+
+
+variable "groq_base_url" {
+  type        = string
+  description = "Groq OpenAI-compatible base URL"
+  default     = "https://api.groq.com/openai/v1"
 }

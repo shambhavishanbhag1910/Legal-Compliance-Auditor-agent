@@ -45,8 +45,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "data" {
   }
 }
 
-resource "aws_secretsmanager_secret" "openai" {
-  name = "${var.project_name}-openai-api-key-${random_id.suffix.hex}"
+resource "aws_secretsmanager_secret" "groq" {
+  name = "${var.project_name}-groq-api-key-${random_id.suffix.hex}"
 }
 
 resource "aws_cloudwatch_log_group" "app" {
@@ -76,19 +76,25 @@ resource "aws_iam_role_policy_attachment" "execution_managed" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-resource "aws_iam_role_policy" "execution_secret" {
-  name = "read-openai-secret"
-  role = aws_iam_role.execution.id
+from fastapi.testclient import TestClient
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect   = "Allow"
-      Action   = ["secretsmanager:GetSecretValue"]
-      Resource = aws_secretsmanager_secret.openai.arn
-    }]
-  })
-}
+from app.main import app
+
+
+client = TestClient(app)
+
+
+def test_health_endpoint():
+    response = client.get("/health")
+
+    assert response.status_code == 200
+
+    payload = response.json()
+
+    assert payload["status"] == "healthy"
+    assert "storage_backend" in payload
+    assert "model_configured" in payload
+    assert "api_key_configured" in payload
 
 resource "aws_iam_role" "task" {
   name = "${var.project_name}-task-${random_id.suffix.hex}"
@@ -221,17 +227,42 @@ resource "aws_ecs_task_definition" "app" {
       }]
 
       environment = [
-        { name = "OPENAI_MODEL", value = var.openai_model },
-        { name = "STORAGE_BACKEND", value = "s3" },
-        { name = "S3_BUCKET", value = aws_s3_bucket.data.bucket },
-        { name = "AWS_REGION", value = var.aws_region },
-        { name = "SELF_CONSISTENCY_RUNS", value = "3" },
-        { name = "MAX_TOOL_STEPS", value = "6" }
+        {
+          name  = "GROQ_MODEL"
+          value = var.groq_model
+        },
+        {
+          name  = "GROQ_BASE_URL"
+          value = var.groq_base_url
+        },
+        {
+          name  = "STORAGE_BACKEND"
+          value = "s3"
+        },
+        {
+          name  = "S3_BUCKET"
+          value = aws_s3_bucket.data.bucket
+        },
+        {
+          name  = "AWS_REGION"
+          value = var.aws_region
+        },
+        {
+          name  = "SELF_CONSISTENCY_RUNS"
+          value = "3"
+        },
+        {
+          name  = "MAX_TOOL_STEPS"
+          value = "6"
+        }
       ]
 
+
+
+
       secrets = [{
-        name      = "OPENAI_API_KEY"
-        valueFrom = aws_secretsmanager_secret.openai.arn
+        name      = "GROQ_API_KEY"
+        valueFrom = aws_secretsmanager_secret.groq.arn
       }]
 
       logConfiguration = {

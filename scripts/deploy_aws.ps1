@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
-if (-not $env:OPENAI_API_KEY) {
-    throw "Set OPENAI_API_KEY in the current PowerShell session first."
+if (-not $env:GROQ_API_KEY) {
+    throw "Set GROQ_API_KEY in the current PowerShell session first."
 }
 
 $Region = if ($env:AWS_REGION) { $env:AWS_REGION } else { "ap-south-1" }
@@ -14,17 +14,17 @@ try {
 
     terraform apply `
         -target=aws_ecr_repository.app `
-        -target=aws_secretsmanager_secret.openai `
+        -target=aws_secretsmanager_secret.groq `
         -target=random_id.suffix `
         -var="aws_region=$Region" `
         -auto-approve
 
     $Ecr = terraform output -raw ecr_repository_url
-    $SecretArn = terraform output -raw openai_secret_arn
+    $SecretArn = terraform output -raw groq_secret_arn
 
     aws secretsmanager put-secret-value `
         --secret-id $SecretArn `
-        --secret-string $env:OPENAI_API_KEY `
+        --secret-string $env:GROQ_API_KEY `
         --region $Region | Out-Null
 
     $Registry = $Ecr.Split("/")[0]

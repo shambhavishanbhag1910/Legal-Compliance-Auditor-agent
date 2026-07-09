@@ -2,17 +2,23 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+
   pull_request:
-    branches: [main]
+    branches:
+      - main
+
   workflow_dispatch:
+
 
 jobs:
   test:
+    name: Lint and Test
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -26,19 +32,82 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
 
-      - name: Lint
-        run: ruff check app tests scripts
+      - name: Run Ruff
+        run: |
+          ruff check app tests scripts
 
-      - name: Test
-        run: pytest -q
+      - name: Run tests
+        run: |
+          pytest -q
 
-  docker-build:
+
+  docker-smoke:
+    name: Docker Smoke Test
     needs: test
+
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build image
-        run: docker build -t ai-compliance-auditor:${{ github.sha }} .
+      - name: Build Docker image
+        run: |
+          docker build \
+            -t ai-compliance-auditor:${{ github.sha }} \
+            .
+
+      - name: Start container
+        run: |
+          docker run -d \
+            --name auditor \
+            -e GROQ_API_KEY=dummy-ci-key \
+            -e GROQ_MODEL=openai/gpt-oss-20b \
+            -e GROQ_BASE_URL=https://api.groq.com/openai/v1 \
+            -e STORAGE_BACKEND=local \
+            -e LOCAL_DATA_DIR=/app/data \
+            -p 8000:8000 \
+            ai-compliance-auditor:${{ github.sha }}
+
+      - name: Wait for service
+        run: |
+          for i in {1..30}; do
+
+            if curl \
+              --fail \
+              http://127.0.0.1:8000/health
+            then
+              echo "Service is healthy."
+              exit 0
+            fi
+
+            echo "Waiting for service..."
+            sleep 2
+
+          done
+
+          docker logs auditor
+          exit 1
+
+      - name: Verify frontend
+        run: |
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            http://127.0.0.1:8000/ \
+            > /dev/null
+
+      - name: Verify OpenAPI
+        run: |
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            http://127.0.0.1:8000/openapi.json \
+            > /dev/null
+
+      - name: Show container logs on failure
+        if: failure()
+        run: |
+          docker logs auditor

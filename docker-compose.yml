@@ -1,16 +1,26 @@
 services:
-  auditor-api:
+  auditor:
     build:
       context: .
-    ports:
-      - "8000:8000"
+      dockerfile: Dockerfile
+
+    container_name: ai-compliance-auditor
+
     env_file:
       - .env
+
     environment:
       STORAGE_BACKEND: local
       LOCAL_DATA_DIR: /app/data
+
+    ports:
+      - "8000:8000"
+
     volumes:
       - auditor_data:/app/data
+
+    restart: unless-stopped
+
 
 volumes:
   auditor_data:

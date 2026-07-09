@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import Field
+from pydantic import Field, SecretStr
 from pydantic_settings import (
     BaseSettings,
     SettingsConfigDict,
@@ -8,7 +8,8 @@ from pydantic_settings import (
 
 
 class Settings(BaseSettings):
-    groq_api_key: str = ""
+
+    groq_api_key: SecretStr = SecretStr("")
 
     groq_model: str = (
         "openai/gpt-oss-20b"
@@ -19,9 +20,11 @@ class Settings(BaseSettings):
     )
 
     storage_backend: str = "local"
+
     local_data_dir: str = "data"
 
     aws_region: str = "ap-south-1"
+
     s3_bucket: str = ""
 
     self_consistency_runs: int = Field(
@@ -37,7 +40,7 @@ class Settings(BaseSettings):
     )
 
     max_tool_steps: int = Field(
-        default=6,
+        default=2,
         ge=1,
         le=12,
     )

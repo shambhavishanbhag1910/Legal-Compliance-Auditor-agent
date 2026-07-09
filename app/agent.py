@@ -37,7 +37,7 @@ class EvidenceAgent:
     """
 
     API_MAX_ATTEMPTS = 6
-
+    MAX_RETRY_AFTER_SECONDS = 90.0
 
     # =========================================================
     # INITIALIZATION
@@ -48,7 +48,7 @@ class EvidenceAgent:
         settings: Settings,
     ) -> None:
 
-        if not settings.groq_api_key:
+        if not settings.groq_api_key.get_secret_value():
             raise RuntimeError(
                 "GROQ_API_KEY is required "
                 "for evidence collection."
@@ -67,7 +67,7 @@ class EvidenceAgent:
         self.settings = settings
 
         self.client = OpenAI(
-            api_key=settings.groq_api_key,
+            api_key=settings.groq_api_key.get_secret_value(),
             base_url=settings.groq_base_url,
         )
 
@@ -81,10 +81,7 @@ class EvidenceAgent:
         exc: RateLimitError,
     ) -> float | None:
         """
-        Read the retry-after value from a 429 response.
-
-        Returns:
-            Number of seconds to wait, or None if unavailable.
+        Read retry-after from a 429 response.
         """
 
         response = getattr(
@@ -116,7 +113,6 @@ class EvidenceAgent:
 
 
         try:
-
             return float(
                 retry_after
             )
@@ -125,8 +121,21 @@ class EvidenceAgent:
             TypeError,
             ValueError,
         ):
-
             return None
+        # if retry_after is None:
+        #     return None
+
+        # try:
+        #     return float(
+        #         retry_after
+        #     )
+
+        # except (
+        #     TypeError,
+        #     ValueError,
+        # ):
+
+        #     return None
 
 
     # =========================================================
@@ -160,26 +169,12 @@ class EvidenceAgent:
                     model=self.settings.groq_model,
 
                     instructions=(
-                        "You are an evidence-gathering "
-                        "compliance agent. "
-
-                        "Use document tools iteratively. "
-
-                        "Gather evidence for every framework "
-                        "rule. "
-
-                        "Search broadly enough to identify both "
-                        "present disclosures and missing or "
-                        "unclear disclosures. "
-
-                        "Do not make final legal conclusions "
-                        "during this evidence collection phase. "
-
-                        "Do not provide private chain-of-thought. "
-
-                        "For every tool call, provide only a "
-                        "short operational purpose describing "
-                        "what evidence is being sought."
+                        "You are an evidence-gathering compliance agent. "
+                        "Use document tools to gather evidence for all framework rules. "
+                        "When multiple independent searches are needed, request them "
+                        "in the same response where possible. "
+                        "Avoid repeating semantically equivalent searches. "
+                        "Do not make final legal conclusions during evidence collection."
                     ),
 
                     input=input_items,
@@ -188,7 +183,7 @@ class EvidenceAgent:
 
                     tool_choice="auto",
 
-                    parallel_tool_calls=False,
+                    parallel_tool_calls=True,
                 )
 
 
@@ -216,6 +211,28 @@ class EvidenceAgent:
                 )
 
 
+                # -------------------------------------------------
+                # Reject extremely long waits
+                # -------------------------------------------------
+
+                if (
+                    retry_after is not None
+                    and retry_after
+                    > self.MAX_RETRY_AFTER_SECONDS
+                ):
+
+                    raise RuntimeError(
+                        "Groq returned a long rate-limit wait of "
+                        f"{retry_after:.2f} seconds during "
+                        "evidence collection. "
+                        "Stopping instead of blocking the pipeline."
+                    ) from exc
+
+
+                # -------------------------------------------------
+                # Calculate retry delay
+                # -------------------------------------------------
+
                 if retry_after is not None:
 
                     delay = retry_after
@@ -228,7 +245,6 @@ class EvidenceAgent:
                     )
 
 
-                # Small jitter helps prevent repeated collisions.
                 delay += random.uniform(
                     0.15,
                     0.50,
@@ -253,7 +269,6 @@ class EvidenceAgent:
                 time.sleep(
                     delay
                 )
-
 
             # -------------------------------------------------
             # TEMPORARY CONNECTION PROBLEMS

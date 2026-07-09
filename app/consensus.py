@@ -1,7 +1,7 @@
 from collections import Counter, defaultdict
 
-from app.schemas import AuditReport, ComplianceFinding, RiskLevel
 
+from app.schemas import AuditReport, RiskLevel
 
 def majority_value(values: list[str]) -> str:
     if not values:

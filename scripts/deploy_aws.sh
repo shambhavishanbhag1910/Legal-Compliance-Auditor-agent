@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ -z "${OPENAI_API_KEY:-}" ]]; then
-  echo "Set OPENAI_API_KEY first." >&2
+if [[ -z "${GROQ_API_KEY:-}" ]]; then
+  echo "Set GROQ_API_KEY first." >&2
   exit 1
 fi
 

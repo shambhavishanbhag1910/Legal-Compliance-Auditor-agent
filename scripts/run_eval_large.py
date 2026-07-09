@@ -99,6 +99,39 @@ def append_case_result(result: dict[str, Any]) -> None:
     with CASE_RESULT_FILE.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(result, ensure_ascii=False) + "\n")
 
+def load_all_results() -> list[dict[str, Any]]:
+    """
+    Load all accumulated evaluation results from JSONL.
+
+    If the same case was run more than once,
+    keep only the latest result for that case_id.
+    """
+
+    if not CASE_RESULT_FILE.exists():
+        return []
+
+    results_by_case: dict[str, dict[str, Any]] = {}
+
+    with CASE_RESULT_FILE.open(
+        "r",
+        encoding="utf-8",
+    ) as handle:
+
+        for line in handle:
+            line = line.strip()
+
+            if not line:
+                continue
+
+            result = json.loads(line)
+
+            results_by_case[
+                result["case_id"]
+            ] = result
+
+    return list(
+        results_by_case.values()
+    )
 
 def build_summary(results: list[dict[str, Any]]) -> dict[str, Any]:
     totals = {"tp": 0, "fp": 0, "fn": 0}
@@ -169,8 +202,12 @@ def main() -> None:
 
     RESULT_DIR.mkdir(parents=True, exist_ok=True)
 
-    if args.fresh_results and CASE_RESULT_FILE.exists():
-        CASE_RESULT_FILE.unlink()
+    if args.fresh_results:
+        if CASE_RESULT_FILE.exists():
+            CASE_RESULT_FILE.unlink()
+
+        if SUMMARY_FILE.exists():
+            SUMMARY_FILE.unlink()
 
     run_results: list[dict[str, Any]] = []
 
@@ -253,11 +290,19 @@ def main() -> None:
         if index < len(cases):
             time.sleep(args.sleep)
 
-    summary = build_summary(run_results)
-    SUMMARY_FILE.write_text(
-        json.dumps(summary, indent=2),
-        encoding="utf-8",
+    all_results = load_all_results()
+
+    summary = build_summary(
+        all_results
     )
+
+    SUMMARY_FILE.write_text(
+        json.dumps(
+            summary,
+            indent=2,
+        ),
+        encoding="utf-8",
+)
 
     print("\nEVALUATION SUMMARY")
     print(json.dumps(summary, indent=2))

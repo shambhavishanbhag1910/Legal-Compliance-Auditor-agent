@@ -28,8 +28,8 @@ def health() -> dict:
     return {
         "status": "healthy",
         "storage_backend": settings.storage_backend,
-        "model_configured": bool(settings.GROQ_MODEL),
-        "api_key_configured": bool(settings.GROQ_API_KEY),
+        "model_configured": bool(settings.groq_model),
+        "api_key_configured": bool(settings.groq_api_key.get_secret_value()),
     }
 
 
