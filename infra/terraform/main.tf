@@ -64,9 +64,9 @@ resource "aws_iam_role" "execution" {
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Effect = "Allow"
+      Effect    = "Allow"
       Principal = { Service = "ecs-tasks.amazonaws.com" }
-      Action = "sts:AssumeRole"
+      Action    = "sts:AssumeRole"
     }]
   })
 }
@@ -75,26 +75,26 @@ resource "aws_iam_role_policy_attachment" "execution_managed" {
   role       = aws_iam_role.execution.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
+resource "aws_iam_role_policy" "execution_secret" {
+  name = "read-groq-secret"
+  role = aws_iam_role.execution.id
 
-from fastapi.testclient import TestClient
+  policy = jsonencode({
+    Version = "2012-10-17"
 
-from app.main import app
+    Statement = [
+      {
+        Effect = "Allow"
 
+        Action = [
+          "secretsmanager:GetSecretValue"
+        ]
 
-client = TestClient(app)
-
-
-def test_health_endpoint():
-    response = client.get("/health")
-
-    assert response.status_code == 200
-
-    payload = response.json()
-
-    assert payload["status"] == "healthy"
-    assert "storage_backend" in payload
-    assert "model_configured" in payload
-    assert "api_key_configured" in payload
+        Resource = aws_secretsmanager_secret.groq.arn
+      }
+    ]
+  })
+}
 
 resource "aws_iam_role" "task" {
   name = "${var.project_name}-task-${random_id.suffix.hex}"
@@ -102,9 +102,9 @@ resource "aws_iam_role" "task" {
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Effect = "Allow"
+      Effect    = "Allow"
       Principal = { Service = "ecs-tasks.amazonaws.com" }
-      Action = "sts:AssumeRole"
+      Action    = "sts:AssumeRole"
     }]
   })
 }
@@ -253,7 +253,7 @@ resource "aws_ecs_task_definition" "app" {
         },
         {
           name  = "MAX_TOOL_STEPS"
-          value = "6"
+          value = "2"
         }
       ]
 

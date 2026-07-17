@@ -22,10 +22,10 @@ try {
     $Ecr = terraform output -raw ecr_repository_url
     $SecretArn = terraform output -raw groq_secret_arn
 
-    aws secretsmanager put-secret-value `
-        --secret-id $SecretArn `
-        --secret-string $env:GROQ_API_KEY `
-        --region $Region | Out-Null
+    aws secretsmanager put-secret-value \
+    --secret-id "$SECRET_ARN" \
+    --secret-string "$GROQ_API_KEY" \
+    --region "$REGION" >/dev/null
 
     $Registry = $Ecr.Split("/")[0]
     aws ecr get-login-password --region $Region |

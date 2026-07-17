@@ -1,38 +1,137 @@
 #!/usr/bin/env bash
+
 set -euo pipefail
 
+
+REGION="${AWS_REGION:-ap-south-1}"
+
+
 if [[ -z "${GROQ_API_KEY:-}" ]]; then
-  echo "Set GROQ_API_KEY first." >&2
+  echo "ERROR: GROQ_API_KEY is not set."
+  echo "Set it before running this script:"
+  echo 'export GROQ_API_KEY="your-key-here"'
   exit 1
 fi
 
-REGION="${AWS_REGION:-ap-south-1}"
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-TF_DIR="${ROOT}/infra/terraform"
 
-pushd "$TF_DIR" >/dev/null
+echo "Using AWS region: ${REGION}"
+
+
+# ---------------------------------------------------------
+# Move to Terraform directory
+# ---------------------------------------------------------
+
+cd "$(dirname "$0")/../infra/terraform"
+
+
+# ---------------------------------------------------------
+# Initialize Terraform
+# ---------------------------------------------------------
+
+echo "Initializing Terraform..."
 
 terraform init
 
-terraform apply   -target=aws_ecr_repository.app   -target=aws_secretsmanager_secret.openai   -target=random_id.suffix   -var="aws_region=${REGION}"   -auto-approve
 
-ECR="$(terraform output -raw ecr_repository_url)"
-SECRET_ARN="$(terraform output -raw openai_secret_arn)"
+# ---------------------------------------------------------
+# Create bootstrap resources first
+# ---------------------------------------------------------
 
-aws secretsmanager put-secret-value   --secret-id "$SECRET_ARN"   --secret-string "$OPENAI_API_KEY"   --region "$REGION" >/dev/null
+echo "Creating ECR repository and Groq secret..."
 
-REGISTRY="${ECR%%/*}"
-aws ecr get-login-password --region "$REGION"   | docker login --username AWS --password-stdin "$REGISTRY"
+terraform apply \
+  -target=aws_ecr_repository.app \
+  -target=aws_secretsmanager_secret.groq \
+  -target=random_id.suffix \
+  -var="aws_region=${REGION}" \
+  -auto-approve
 
-docker build -t ai-compliance-auditor "$ROOT"
-docker tag ai-compliance-auditor:latest "${ECR}:latest"
-docker push "${ECR}:latest"
 
-terraform apply   -var="aws_region=${REGION}"   -var="image_uri=${ECR}:latest"   -auto-approve
+# ---------------------------------------------------------
+# Read Terraform outputs
+# ---------------------------------------------------------
 
-echo
-echo "Application URL:"
-terraform output -raw application_url
-echo
+ECR_URL="$(terraform output -raw ecr_repository_url)"
 
-popd >/dev/null
+SECRET_ARN="$(terraform output -raw groq_secret_arn)"
+
+
+echo "ECR repository: ${ECR_URL}"
+
+
+# ---------------------------------------------------------
+# Store Groq API key in Secrets Manager
+# ---------------------------------------------------------
+
+echo "Updating Groq API key in AWS Secrets Manager..."
+
+aws secretsmanager put-secret-value \
+  --secret-id "${SECRET_ARN}" \
+  --secret-string "${GROQ_API_KEY}" \
+  --region "${REGION}" \
+  >/dev/null
+
+
+# ---------------------------------------------------------
+# Authenticate Docker with ECR
+# ---------------------------------------------------------
+
+echo "Authenticating Docker with Amazon ECR..."
+
+aws ecr get-login-password \
+  --region "${REGION}" \
+  | docker login \
+      --username AWS \
+      --password-stdin \
+      "${ECR_URL%/*}"
+
+
+# ---------------------------------------------------------
+# Build Docker image
+# ---------------------------------------------------------
+
+echo "Building Docker image..."
+
+docker build \
+  -t ai-compliance-auditor:latest \
+  ../..
+
+
+# ---------------------------------------------------------
+# Tag image
+# ---------------------------------------------------------
+
+echo "Tagging Docker image..."
+
+docker tag \
+  ai-compliance-auditor:latest \
+  "${ECR_URL}:latest"
+
+
+# ---------------------------------------------------------
+# Push image to ECR
+# ---------------------------------------------------------
+
+echo "Pushing Docker image to ECR..."
+
+docker push \
+  "${ECR_URL}:latest"
+
+
+# ---------------------------------------------------------
+# Deploy full infrastructure
+# ---------------------------------------------------------
+
+echo "Deploying complete AWS infrastructure..."
+
+terraform apply \
+  -var="aws_region=${REGION}" \
+  -var="image_tag=latest" \
+  -auto-approve
+
+
+echo ""
+echo "Deployment complete."
+echo ""
+
+terraform output

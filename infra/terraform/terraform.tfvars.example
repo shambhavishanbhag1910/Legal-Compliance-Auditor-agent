@@ -1,3 +1,4 @@
 aws_region   = "ap-south-1"
 project_name = "ai-compliance-auditor"
-openai_model = "gpt-4.1-mini"
+groq_model = "openai/gpt-oss-20b"
+groq_base_url = "https://api.groq.com/openai/v1"

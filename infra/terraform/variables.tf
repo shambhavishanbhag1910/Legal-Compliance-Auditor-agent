@@ -18,13 +18,13 @@ variable "image_uri" {
 
 variable "groq_model" {
   type        = string
-  description = "Groq model name"
+  description = "Groq model used by the compliance auditor"
   default     = "openai/gpt-oss-20b"
 }
 
 
 variable "groq_base_url" {
   type        = string
-  description = "Groq OpenAI-compatible base URL"
+  description = "Groq OpenAI-compatible API base URL"
   default     = "https://api.groq.com/openai/v1"
 }
