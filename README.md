@@ -50,7 +50,7 @@ The implementation deliberately does not expose private chain-of-thought. The ag
 - PDF, TXT, and Markdown ingestion
 - BM25 document search
 - ReAct-style iterative tool use
-- OpenAI function calling
+- Groq-compatible OpenAI SDK tool calling
 - Strict Pydantic structured outputs
 - Three-run self-consistency voting
 - LLM-as-a-Judge evaluation
@@ -216,8 +216,12 @@ LOCAL_DATA_DIR=data
 ### 4. Start the API
 
 ```bash
-uvicorn app.main:app --reload --port 8000
+uvicorn app.main_with_ui:app --reload --port 8000
 ```
+Open the frontend:
+
+```text
+http://127.0.0.1:8000/
 
 Swagger UI:
 
@@ -374,7 +378,7 @@ S3
 
 Secrets Manager
   |
-  `-- OPENAI_API_KEY
+  `-- GROQ_API_KEY
 
 CloudWatch Logs
 ```
@@ -389,14 +393,14 @@ CloudWatch Logs
 ### PowerShell deployment
 
 ```powershell
-$env:OPENAI_API_KEY="your-key"
+$env:GROQ_API_KEY="your-groq-key"
 .\scripts\deploy_aws.ps1
 ```
 
 ### macOS/Linux deployment
 
 ```bash
-export OPENAI_API_KEY="your-key"
+export GROQ_API_KEY="your-groq-key"
 chmod +x scripts/deploy_aws.sh
 ./scripts/deploy_aws.sh
 ```
@@ -445,3 +449,15 @@ Tests cover:
 - precision, recall, and F1
 
 ![UI](image.png)
+
+## Roadmap
+
+See [`docs/ROADMAP.md`](docs/ROADMAP.md).
+
+Highest-priority production upgrade:
+
+- move synchronous `/audits` execution to asynchronous audit jobs
+- return `job_id`
+- process audit in background
+- expose job status endpoint
+- update frontend with real progress polling
