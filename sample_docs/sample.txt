@@ -1,0 +1,4 @@
+We collect name and email address to provide our service.
+We use this information to manage accounts and send service updates.
+We share data with service providers.
+Users can contact privacy@example.com for questions.

@@ -1,8 +1,7 @@
 # AI Legal & Compliance Auditor
 
-A deployment-ready AI audit pipeline that reads regulatory or policy documents, uses a tool-using agent to gather evidence, generates three schema-constrained audit candidates, applies self-consistency voting, and evaluates the final report for faithfulness and hallucination risk.
+AI audit pipeline that reads regulatory or policy documents, uses a tool-using agent to gather evidence, generates three schema-constrained audit candidates, applies self-consistency voting, and evaluates the final report for faithfulness and hallucination risk.
 
-> Educational portfolio project only. It is not legal advice.
 
 ## Architecture
 
@@ -66,6 +65,38 @@ The implementation deliberately does not expose private chain-of-thought. The ag
 - AWS Secrets Manager integration
 - CloudWatch Logs
 
+## End-to-End Project Status
+
+This project demonstrates an evidence-first AI Legal and Compliance Auditor with:
+
+- FastAPI backend
+- Frontend audit dashboard
+- Document upload and parsing
+- Local BM25 evidence retrieval
+- Tool-driven evidence collection
+- Structured audit generation
+- Self-consistency consensus
+- Independent LLM-as-Judge evaluation
+- Dockerized deployment
+- GitHub Actions CI
+- Terraform Infrastructure as Code
+- AWS ECS Fargate deployment
+- Amazon ECR image registry
+- Application Load Balancer
+- Amazon S3 document/audit storage
+- AWS Secrets Manager for Groq API key
+- CloudWatch logging
+
+The application has been deployed on AWS ECS Fargate and the frontend and `/health` endpoint were successfully verified.
+
+Current runtime status:
+
+- Frontend: Working
+- `/health`: Working
+- Storage backend: S3
+- Model provider: Groq-compatible OpenAI SDK endpoint
+- Full long-running audit execution: requires async job handling for production-grade cloud use
+
 ## Project Structure
 
 ```text
@@ -108,6 +139,28 @@ The project includes compact demonstration catalogs for:
 - financial disclosure documents
 
 These catalogs demonstrate the architecture and evaluation workflow. They are not a substitute for jurisdiction-specific legal requirements.
+
+## Known Production Limitation
+
+The current `/audits` endpoint runs the full audit synchronously:
+
+1. Evidence collection
+2. Multi-candidate audit generation
+3. Consensus
+4. Independent judge evaluation
+5. Audit persistence
+
+This works for local testing and controlled demos, but long-running cloud execution should be moved to an asynchronous job architecture.
+
+Recommended production upgrade:
+
+- `POST /audits` returns `202 Accepted` with a `job_id`
+- Background worker performs audit execution
+- `GET /jobs/{job_id}` returns status and progress
+- Frontend polls job status or uses Server-Sent Events
+- Completed audit is fetched by `audit_id`
+
+This avoids ALB/browser timeout issues and makes the system production-ready for larger documents and multi-step reasoning flows.
 
 ## Local Setup
 
@@ -152,8 +205,12 @@ cp .env.example .env
 Set:
 
 ```text
-OPENAI_API_KEY=your-key
-OPENAI_MODEL=gpt-4.1-mini
+GROQ_API_KEY=your_groq_key
+GROQ_MODEL=openai/gpt-oss-20b
+GROQ_BASE_URL=https://api.groq.com/openai/v1
+
+STORAGE_BACKEND=local
+LOCAL_DATA_DIR=data
 ```
 
 ### 4. Start the API
@@ -192,6 +249,26 @@ curl -X POST "http://127.0.0.1:8000/audits"   -H "Content-Type: application/json
   }'
 ```
 
+## AWS Deployment
+
+The application is containerized and deployed on AWS using:
+
+- Docker
+- Amazon ECR
+- ECS Fargate
+- Application Load Balancer
+- S3 for document/audit storage
+- Secrets Manager for Groq API key
+- CloudWatch Logs
+- Terraform Infrastructure as Code
+
+Health check:
+
+`GET /health`
+
+Runtime storage backend:
+
+`s3`
 The response contains:
 
 - final consensus report
@@ -366,3 +443,5 @@ Tests cover:
 - BM25 retrieval
 - self-consistency majority voting
 - precision, recall, and F1
+
+![UI](image.png)
