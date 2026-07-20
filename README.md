@@ -1,7 +1,21 @@
 # AI Legal & Compliance Auditor
 
-AI audit pipeline that reads regulatory or policy documents, uses a tool-using agent to gather evidence, generates three schema-constrained audit candidates, applies self-consistency voting, and evaluates the final report for faithfulness and hallucination risk.
+AI Legal & Compliance Auditor is an evidence-first audit system for policy, legal, and compact financial disclosure documents.
 
+The system reads a document, builds a local evidence index, uses a tool-driven evidence agent, generates multiple schema-constrained audit candidates, applies self-consistency consensus, and evaluates the final report for faithfulness, completeness, and hallucination risk.
+
+This project demonstrates an end-to-end AI engineering workflow from local development to Docker, CI, Terraform, and AWS ECS Fargate deployment.
+
+## Why This Project Matters
+
+Many LLM audit demos generate fluent reports without proving where the answer came from. This project is designed differently:
+
+- Evidence is collected before report generation.
+- Tool calls are recorded as an auditable trace.
+- Final outputs are constrained by Pydantic schemas.
+- Multiple audit candidates are reconciled through consensus.
+- A separate judge evaluates faithfulness and hallucination risk.
+- The system supports both local storage and S3-backed cloud deployment.
 
 ## Architecture
 
@@ -10,6 +24,9 @@ Raw Document
     |
     v
 Document Parser + Chunk Index
+    |
+    v
+BM25 Evidence Retrieval
     |
     v
 ReAct-style Evidence Agent
@@ -35,11 +52,6 @@ Evidence Bundle
                     |
                     v
  Faithfulness | Completeness | Hallucination Rate
-
-Golden Dataset
-    |
-    v
-Precision | Recall | F1
 ```
 
 The implementation deliberately does not expose private chain-of-thought. The agent records an auditable action trace containing the tool name, arguments, declared evidence purpose, and a result preview.
@@ -47,20 +59,24 @@ The implementation deliberately does not expose private chain-of-thought. The ag
 ## Features
 
 - FastAPI REST API
+- Browser-based frontend audit dashboard
 - PDF, TXT, and Markdown ingestion
 - BM25 document search
-- ReAct-style iterative tool use
-- Groq-compatible OpenAI SDK tool calling
+- Deterministic baseline retrieval for framework rules
+- ReAct-style iterative evidence collection
+- Groq OpenAI-compatible SDK endpoint
+- Tool calling for document search and chunk lookup
 - Strict Pydantic structured outputs
 - Three-run self-consistency voting
-- LLM-as-a-Judge evaluation
+- Independent LLM-as-a-Judge evaluation
 - Precision, recall, and F1 evaluation on golden cases
 - Local filesystem storage for development
 - Amazon S3 persistence for AWS deployment
 - Docker and Docker Compose
-- Pytest
+- Pytest-based test suite
 - GitHub Actions CI
 - Terraform deployment to Amazon ECS Fargate
+- Amazon ECR image registry
 - Application Load Balancer
 - AWS Secrets Manager integration
 - CloudWatch Logs
@@ -83,19 +99,17 @@ This project demonstrates an evidence-first AI Legal and Compliance Auditor with
 - AWS ECS Fargate deployment
 - Amazon ECR image registry
 - Application Load Balancer
-- Amazon S3 document/audit storage
+- Amazon S3 document and audit storage
 - AWS Secrets Manager for Groq API key
 - CloudWatch logging
 
-The application has been deployed on AWS ECS Fargate and the frontend and `/health` endpoint were successfully verified.
+Verified deployment status:
 
-Current runtime status:
-
-- Frontend: Working
-- `/health`: Working
+- Frontend: working
+- `/health`: working
 - Storage backend: S3
-- Model provider: Groq-compatible OpenAI SDK endpoint
-- Full long-running audit execution: requires async job handling for production-grade cloud use
+- Model provider: Groq OpenAI-compatible API endpoint
+- Full long-running audit execution: recommended to move to async jobs for production-grade cloud use
 
 ## Project Structure
 
@@ -110,14 +124,20 @@ ai_legal_compliance_auditor/
 │   ├── judge.py
 │   ├── llm.py
 │   ├── main.py
+│   ├── main_with_ui.py
 │   ├── metrics.py
 │   ├── orchestrator.py
 │   ├── schemas.py
 │   ├── search_index.py
 │   ├── storage.py
 │   └── tools.py
+├── docs/
+│   ├── ARCHITECTURE.md
+│   ├── DEPLOYMENT.md
+│   └── ROADMAP.md
 ├── eval/
 │   └── golden_cases.json
+├── frontend/
 ├── infra/
 │   └── terraform/
 ├── sample_docs/
@@ -154,13 +174,13 @@ This works for local testing and controlled demos, but long-running cloud execut
 
 Recommended production upgrade:
 
-- `POST /audits` returns `202 Accepted` with a `job_id`
+- `POST /audit-jobs` returns `202 Accepted` with a `job_id`
 - Background worker performs audit execution
-- `GET /jobs/{job_id}` returns status and progress
+- `GET /audit-jobs/{job_id}` returns status and progress
 - Frontend polls job status or uses Server-Sent Events
 - Completed audit is fetched by `audit_id`
 
-This avoids ALB/browser timeout issues and makes the system production-ready for larger documents and multi-step reasoning flows.
+This avoids browser and load-balancer timeout issues for larger documents and multi-step reasoning flows.
 
 ## Local Setup
 
@@ -202,26 +222,30 @@ macOS/Linux:
 cp .env.example .env
 ```
 
-Set:
+Set these values in `.env`:
 
 ```text
 GROQ_API_KEY=your_groq_key
 GROQ_MODEL=openai/gpt-oss-20b
 GROQ_BASE_URL=https://api.groq.com/openai/v1
-
 STORAGE_BACKEND=local
 LOCAL_DATA_DIR=data
+SELF_CONSISTENCY_RUNS=3
+MAX_TOOL_STEPS=2
+MAX_UPLOAD_MB=10
 ```
 
-### 4. Start the API
+### 4. Start the full frontend + API app
 
 ```bash
 uvicorn app.main_with_ui:app --reload --port 8000
 ```
+
 Open the frontend:
 
 ```text
 http://127.0.0.1:8000/
+```
 
 Swagger UI:
 
@@ -229,10 +253,30 @@ Swagger UI:
 http://127.0.0.1:8000/docs
 ```
 
+Health check:
+
+```text
+http://127.0.0.1:8000/health
+```
+
 ## Docker
+
+Build and run with Docker Compose:
 
 ```bash
 docker compose up --build
+```
+
+Open:
+
+```text
+http://127.0.0.1:8000/
+```
+
+The Docker image runs:
+
+```text
+uvicorn app.main_with_ui:app --host 0.0.0.0 --port 8000 --workers 2
 ```
 
 ## API Flow
@@ -240,39 +284,32 @@ docker compose up --build
 ### 1. Upload a document
 
 ```bash
-curl -X POST "http://127.0.0.1:8000/documents"   -F "file=@sample_docs/privacy_policy_acme.txt"
+curl -X POST "http://127.0.0.1:8000/documents" \
+  -F "file=@sample_docs/privacy_policy_acme.txt"
+```
+
+The response contains:
+
+```json
+{
+  "document_id": "...",
+  "filename": "privacy_policy_acme.txt",
+  "characters": 1234
+}
 ```
 
 ### 2. Run an audit
 
 ```bash
-curl -X POST "http://127.0.0.1:8000/audits"   -H "Content-Type: application/json"   -d '{
+curl -X POST "http://127.0.0.1:8000/audits" \
+  -H "Content-Type: application/json" \
+  -d '{
     "document_id": "REPLACE_ME",
     "framework": "privacy",
     "runs": 3
   }'
 ```
 
-## AWS Deployment
-
-The application is containerized and deployed on AWS using:
-
-- Docker
-- Amazon ECR
-- ECS Fargate
-- Application Load Balancer
-- S3 for document/audit storage
-- Secrets Manager for Groq API key
-- CloudWatch Logs
-- Terraform Infrastructure as Code
-
-Health check:
-
-`GET /health`
-
-Runtime storage backend:
-
-`s3`
 The response contains:
 
 - final consensus report
@@ -280,6 +317,7 @@ The response contains:
 - tool action trace
 - judge scores
 - unsupported finding IDs
+- fabricated claims
 - candidate count
 
 ### 3. Read a saved audit
@@ -294,9 +332,20 @@ GET /audits/{audit_id}
 GET /health
 ```
 
+Expected health response:
+
+```json
+{
+  "status": "healthy",
+  "storage_backend": "local",
+  "model_configured": true,
+  "api_key_configured": true
+}
+```
+
 ## Self-Consistency Strategy
 
-Each audit uses one evidence-gathering agent pass followed by three independent structured extraction passes.
+Each audit uses one evidence-gathering pass followed by multiple independent structured extraction passes.
 
 Consensus is computed per rule ID:
 
@@ -310,10 +359,16 @@ The consensus layer is deterministic and unit tested.
 
 ## Evaluation
 
-Run:
+Run the default evaluation:
 
 ```bash
 python scripts/run_eval.py
+```
+
+For the larger benchmark runner, use:
+
+```bash
+python scripts/run_eval_large.py --runs 3
 ```
 
 The golden dataset is stored in:
@@ -322,7 +377,7 @@ The golden dataset is stored in:
 eval/golden_cases.json
 ```
 
-The evaluation calculates:
+Evaluation calculates:
 
 ```text
 Precision
@@ -349,13 +404,40 @@ fabricated_claims
 | Zero-shot prompting | Framework-based audit instructions |
 | ReAct | Iterative evidence tool loop |
 | Tool calling | Search, exact chunk read, glossary lookup |
-| Function calling | OpenAI Responses API tools |
 | Structured output | Pydantic `AuditReport` and `JudgeResult` |
 | Self-consistency | Three candidates plus majority consensus |
 | Meta prompting | Framework rules inserted dynamically |
 | LLM-as-a-Judge | Separate source-grounded evaluation pass |
+| Evidence grounding | Audit findings tied back to retrieved chunks |
 
 ## AWS Deployment
+
+The application is containerized and deployed on AWS using:
+
+- Docker
+- Amazon ECR
+- Amazon ECS Fargate
+- Application Load Balancer
+- Amazon S3 for document and audit storage
+- AWS Secrets Manager for Groq API key
+- Amazon CloudWatch Logs
+- Terraform Infrastructure as Code
+
+Health check:
+
+```text
+GET /health
+```
+
+Runtime storage backend:
+
+```text
+s3
+```
+
+Detailed deployment steps are available in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
+
+## Cloud Architecture Summary
 
 The Terraform stack provisions:
 
@@ -369,7 +451,7 @@ ECS Fargate Service
 Application Load Balancer
   |
   v
-Public API
+Public Frontend + API
 
 S3
   |
@@ -383,72 +465,58 @@ Secrets Manager
 CloudWatch Logs
 ```
 
-### Prerequisites
-
-- AWS CLI authenticated
-- Terraform installed
-- Docker installed
-- an AWS account with permissions for ECR, ECS, IAM, EC2 load balancing, S3, CloudWatch Logs, and Secrets Manager
-
-### PowerShell deployment
-
-```powershell
-$env:GROQ_API_KEY="your-groq-key"
-.\scripts\deploy_aws.ps1
-```
-
-### macOS/Linux deployment
-
-```bash
-export GROQ_API_KEY="your-groq-key"
-chmod +x scripts/deploy_aws.sh
-./scripts/deploy_aws.sh
-```
-
-The deployment scripts:
-
-1. initialize Terraform
-2. create ECR and the Secrets Manager secret metadata
-3. write the API key to Secrets Manager
-4. build the Docker image
-5. push the image to ECR
-6. deploy ECS Fargate, ALB, S3, IAM, and logging resources
-7. print the public ALB URL
-
-Default AWS Region:
-
-```text
-ap-south-1
-```
-
-Override it with the `AWS_REGION` environment variable.
-
 ## Security Notes
 
 - The API key is not committed.
-- AWS deployment injects it from Secrets Manager.
+- AWS deployment injects the key from Secrets Manager.
 - Uploaded files are restricted by type and size.
 - Agent tools are narrow and read-only.
 - No arbitrary shell execution is exposed.
 - Search results and tool iterations are bounded.
 - Final reports and judge results are schema constrained.
 - Terraform blocks public S3 access.
+- The current public demo deployment should not be treated as hardened production.
 
 ## Tests
 
+Run lint and tests:
+
 ```bash
+ruff check app tests scripts
 pytest -q
 ```
 
-Tests cover:
+The test suite is intended to cover:
 
+- API health checks
 - document parsing
 - chunking
 - BM25 retrieval
 - self-consistency majority voting
-- precision, recall, and F1
+- precision, recall, and F1 metrics
+- local storage behavior
+- selected API and orchestration failure paths
 
-![UI](image.png)
+## CI
+
+GitHub Actions validates:
+
+- dependency installation
+- Ruff linting
+- Pytest test suite
+- Docker image build
+- container startup
+- `/health` endpoint
+- frontend route
+- OpenAPI route
+
+## Documentation
+
+Additional documentation:
+
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+- [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)
+- [`docs/ROADMAP.md`](docs/ROADMAP.md)
 
 ## Roadmap
 
@@ -458,6 +526,10 @@ Highest-priority production upgrade:
 
 - move synchronous `/audits` execution to asynchronous audit jobs
 - return `job_id`
-- process audit in background
+- process audit in a background worker
 - expose job status endpoint
 - update frontend with real progress polling
+
+## Disclaimer
+
+This project is an AI engineering and compliance-audit demonstration. It is not legal advice and should not be used as a substitute for review by qualified legal, compliance, or regulatory professionals.
