@@ -1,5 +1,60 @@
 # AI Legal & Compliance Auditor
 
+<p align="center">
+  <strong>Evidence-first Agentic AI for auditable compliance analysis</strong>
+</p>
+
+<p align="center">
+  ReAct Agents · Evidence Retrieval · Structured Outputs · Self-Consistency · LLM Evaluation · FastAPI · Docker · Terraform · AWS ECS
+</p>
+
+<p align="center">
+
+![CI](https://github.com/shambhavishanbhag1910/Legal-Compliance-Auditor-agent/actions/workflows/ci.yml/badge.svg)
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-API-009688?logo=fastapi&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?logo=docker&logoColor=white)
+![Terraform](https://img.shields.io/badge/Terraform-IaC-844FBA?logo=terraform&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-ECS%20Fargate-FF9900?logo=amazonaws&logoColor=white)
+
+</p>
+
+---
+
+## Why this project stands out
+
+Most LLM compliance demos generate an answer first and attempt to justify it afterward.
+
+This project takes an **evidence-first approach**.
+
+It retrieves source evidence, records auditable tool actions, generates schema-constrained findings, compares multiple independent audit candidates, reaches a deterministic consensus, and evaluates the final answer for faithfulness, completeness and hallucination risk.
+
+### End-to-end flow
+
+```mermaid
+flowchart LR
+    A[Document] --> B[Parser & Chunk Index]
+    B --> C[BM25 Evidence Retrieval]
+    C --> D[ReAct Evidence Agent]
+
+    D --> E[Evidence Bundle]
+
+    E --> F1[Audit Candidate 1]
+    E --> F2[Audit Candidate 2]
+    E --> F3[Audit Candidate 3]
+
+    F1 --> G[Self-Consistency Consensus]
+    F2 --> G
+    F3 --> G
+
+    G --> H[Pydantic Structured Report]
+    H --> I[LLM as Judge]
+
+    I --> J[Faithfulness]
+    I --> K[Completeness]
+    I --> L[Hallucination Risk]
+```
+
 AI Legal & Compliance Auditor is an evidence-first audit system for policy, legal, and compact financial disclosure documents.
 
 The system reads a document, builds a local evidence index, uses a tool-driven evidence agent, generates multiple schema-constrained audit candidates, applies self-consistency consensus, and evaluates the final report for faithfulness, completeness, and hallucination risk.
@@ -533,3 +588,20 @@ Highest-priority production upgrade:
 ## Disclaimer
 
 This project is an AI engineering and compliance-audit demonstration. It is not legal advice and should not be used as a substitute for review by qualified legal, compliance, or regulatory professionals.
+
+## Skills Demonstrated
+
+### Agentic AI
+ReAct-style agents · Tool calling · Evidence grounding · Multi-step reasoning · Structured outputs · Self-consistency
+
+### LLM Engineering
+Prompt engineering · Hallucination evaluation · LLM-as-a-Judge · Golden datasets · Faithfulness evaluation
+
+### Backend Engineering
+FastAPI · Pydantic · REST APIs · File ingestion · Error handling
+
+### MLOps / LLMOps
+Automated evaluation · Pytest · Ruff · GitHub Actions · Docker
+
+### Cloud & Infrastructure
+AWS ECS Fargate · ECR · S3 · Secrets Manager · CloudWatch · Terraform
