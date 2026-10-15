@@ -183,7 +183,7 @@ class EvidenceAgent:
 
                     tool_choice="auto",
 
-                    parallel_tool_calls=True,
+                    parallel_tool_calls=False,
                 )
 
 

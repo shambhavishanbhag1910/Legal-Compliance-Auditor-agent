@@ -126,7 +126,7 @@ echo "Deploying complete AWS infrastructure..."
 
 terraform apply \
   -var="aws_region=${REGION}" \
-  -var="image_tag=latest" \
+  -var="image_uri=${ECR_URL}:latest" \
   -auto-approve
 
 

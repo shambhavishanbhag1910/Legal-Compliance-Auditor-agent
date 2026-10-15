@@ -6,14 +6,14 @@ from app.config import get_settings
 settings = get_settings()
 
 
-print("Model:", settings.GROQ_MODEL)
-print("Base URL:", settings.GROQ_BASE_URL)
-print("API key loaded:", bool(settings.GROQ_API_KEY))
+print("Model:", settings.groq_model)
+print("Base URL:", settings.groq_base_url)
+print("API key loaded:", bool(settings.groq_api_key))
 
 
 client = OpenAI(
-    api_key=settings.GROQ_API_KEY,
-    base_url=settings.GROQ_BASE_URL,
+    api_key=settings.groq_api_key,
+    base_url=settings.groq_base_url,
 )
 
 

@@ -22,16 +22,16 @@ try {
     $Ecr = terraform output -raw ecr_repository_url
     $SecretArn = terraform output -raw groq_secret_arn
 
-    aws secretsmanager put-secret-value \
-    --secret-id "$SECRET_ARN" \
-    --secret-string "$GROQ_API_KEY" \
-    --region "$REGION" >/dev/null
+    aws secretsmanager put-secret-value `
+        --secret-id $SecretArn `
+        --secret-string $env:GROQ_API_KEY `
+        --region $Region | Out-Null
 
     $Registry = $Ecr.Split("/")[0]
     aws ecr get-login-password --region $Region |
         docker login --username AWS --password-stdin $Registry
 
-    docker build -t ai-compliance-auditor $Root
+    docker build -t ai-compliance-auditor:latest $Root
     docker tag ai-compliance-auditor:latest "${Ecr}:latest"
     docker push "${Ecr}:latest"
 
